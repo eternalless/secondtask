@@ -76,34 +76,50 @@
         }
 
         _createClass(PraiseButton, [{
+            key: 'throttles',
+            value: function throttles(fn, wait) {
+                var timer;
+                return function () {
+                    if (!timer) {
+                        timer = setTimeout(function () {
+                            return timer = null;
+                        }, wait);
+                        console.log(timer);
+
+                        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                            args[_key] = arguments[_key];
+                        }
+
+                        return fn.apply(this, args);
+                    }
+                };
+            }
+        }, {
             key: 'clickAction',
             value: function clickAction() {
-                var _this = this;
-
-                this.element.click(function () {
-                    if (throttle) {
-                        clearTimeout(throttle);
+                var that = this;
+                function clicka() {
+                    if (that.num < 10) {
+                        that.element.css('-webkit-filter', 'grayscale(0)');
+                        $('#animation').addClass('num');
+                        that.num++;
+                        setTimeout(function () {
+                            $('#animation').removeClass('num');
+                        }, 1000);
+                        axios.get('/index/update').then(function (res) {
+                            console.log(res);
+                        }).catch(function (err) {
+                            console.log(err);
+                        });
+                    } else {
+                        that.element.css('-webkit-filter', 'grayscale(1)');
+                        that.num = 0;
                     }
-                    throttle = setTimeout(function () {
-                        if (_this.num < 10) {
-                            _this.element.css('-webkit-filter', 'grayscale(0)');
-                            $('#animation').addClass('num');
-                            _this.num++;
-                            setTimeout(function () {
-                                $('#animation').removeClass('num');
-                            }, 1000);
-                            axios.get('/index/update').then(function (res) {
-                                console.log(res);
-                            }).catch(function (err) {
-                                console.log(err);
-                            });
-                        } else {
-                            _this.element.css('-webkit-filter', 'grayscale(1)');
-                            _this.num = 0;
-                        }
-                        console.log(_this.num);
-                    }, 800);
-                });
+                    console.log(that.num);
+                }
+                // const fn  = function(){ console.log("btn clicked")}
+                var btn = document.getElementById('thumb');
+                btn.onclick = this.throttles(clicka, 1000);
             }
         }]);
 
